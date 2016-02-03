@@ -8,10 +8,9 @@ class ZopperSpider(scrapy.Spider):
     start_urls = [ "http://stores.zopper.com/city/Gurgaon" ]
 
     def parse(self, response):
-        #return scrapy.Request("http://stores.zopper.com/city/Gurgaon", 
-        #    callback=self.parse_city_stores,
-        #    meta = { 'city' : 'Gurgaon', 'count' : 0 }
-        #)
+        '''
+            start parsing from here
+        '''
         for link in response.xpath("//ul[@class='cities']/li"):
             url = link.xpath("a/@href").extract()[0]
             city = url.split('/')[-1]
@@ -20,6 +19,9 @@ class ZopperSpider(scrapy.Spider):
             )
 
     def parse_city_stores(self, response):
+        '''
+            get all the stores from a particular city
+        '''
         for sel in response.xpath('//div[@itemtype="http://schema.org/ElectronicsStore"]'):
             a = "*/a[@class='theme-heading-text brand-color-hover']"
             merchant = Merchant()
@@ -40,6 +42,9 @@ class ZopperSpider(scrapy.Spider):
             )
 
     def get_address(self, root):
+        '''
+            returns the address of a store on city page
+        '''
         cityadd2 = root.xpath('p[@class="locality-city"]/text()').extract()[0]
         cityadd1 = root.xpath('p[@class="locality-city"]/a/text()').extract()[0]
         localadd = root.xpath('p[@class="address"]/a/span[@class="streetAddress"]/text()').extract()[0]
