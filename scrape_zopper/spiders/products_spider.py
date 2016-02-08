@@ -67,7 +67,6 @@ class ProductsSpider(scrapy.Spider):
     def parse_open_products(self, response):
         for link in response.xpath('//div[@class="catalog-grid"]/div[@itemtype="http://schema.org/Product"]/*/h3[@class="product-name"]/a/@href'):
             url = response.urljoin(link.extract())
-            print "OPEN PRODUCT =======> ", url
             yield scrapy.Request(url, callback = self.parse_product_real,
                 meta = {'merchant_link': response.meta['merchant_link']}
             )
@@ -89,7 +88,6 @@ class ProductsSpider(scrapy.Spider):
         item['specs'] = specs_str
         
         yield item
-        print item
         
 
  
