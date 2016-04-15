@@ -1,8 +1,0 @@
-f = open('mobiles.txt', 'rb+').read().splitlines()
-out = open('urls_list.py', 'wb+')
-out.write('urls = [')
-for line in f:
-    out.write("'%s', \n"%line)
-
-out.write("]")
-out.close()

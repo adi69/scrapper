@@ -17,4 +17,4 @@ class Product(scrapy.Item):
     out_of_stock_status = scrapy.Field()
     seller = scrapy.Field()
     selling_price = scrapy.Field()
-
+    list_price = scrapy.Field()

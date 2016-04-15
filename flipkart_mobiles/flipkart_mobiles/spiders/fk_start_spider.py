@@ -1,18 +1,16 @@
 import scrapy
-from constants import (
-        _start_urls,
-        _lazy_load_api,
-)
 import json
 from flipkart_mobiles.items import Product
 
 
 class FkProductSpider(scrapy.Spider):
-
-    name = 'FkProduct'
-    allowed_domains = ['flipkart.com']
-    start_urls = _start_urls
     
+    def __init__(self, url_pattern=''):
+        self.name = 'FkProduct'
+        self.allowed_domains = ['flipkart.com']
+        self.start_urls = url_pattern + '1'
+        self._lazy_load_api = url_pattern
+        
     current_start = 1
     total_urls = 0
 
@@ -20,7 +18,7 @@ class FkProductSpider(scrapy.Spider):
         '''
             Starts here. Requires two urls from `constants.py`
             1. `_start_urls`: starting urls list
-            2. `_lazy_load_api`: Loading more products pattern
+            2. `self._lazy_load_api`: Loading more products pattern
         '''
         items = response.xpath('//a[@data-tracking-id="prd_title"]') 
         
@@ -31,7 +29,7 @@ class FkProductSpider(scrapy.Spider):
         self.current_start += len(items)
         
         try:
-            url = _lazy_load_api + str(self.current_start)
+            url = self._lazy_load_api + str(self.current_start)
             print '----> lazy url = %s' % url
             yield scrapy.Request(url, callback = self.parse)
             self.total_urls += 1
@@ -69,7 +67,8 @@ class FkProductSpider(scrapy.Spider):
                 extract()[0]
         except:
             item['rating'] = ''
-
+        
+        #Try get total reviews (for popularity of product)
         try:
             rating_string  = response.xpath(
                     '//*[@class="ratingHistogram"]/div/*[@class="subText"]/text()').\
@@ -77,6 +76,13 @@ class FkProductSpider(scrapy.Spider):
             item['reviews_count'] = rating_string[2] 
         except:
             item['reviews_count'] = ''
+        
+        #Try get List Price
+        try:
+            item['list_price'] = response.xpath(
+                    '//*[@class="price"]/text()').extract()[0]
+        except:
+            item['list_price'] = ''
 
         out_of_stock_class = response.xpath('//*[@class="out-of-stock-status"]')
 
