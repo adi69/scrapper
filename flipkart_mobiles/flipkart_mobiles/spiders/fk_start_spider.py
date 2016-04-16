@@ -5,10 +5,11 @@ from flipkart_mobiles.items import Product
 
 class FkProductSpider(scrapy.Spider):
     
+    name = 'FkProduct'
     def __init__(self, url_pattern=''):
-        self.name = 'FkProduct'
+        self.name = 'fkp'
         self.allowed_domains = ['flipkart.com']
-        self.start_urls = url_pattern + '1'
+        self.start_urls = [url_pattern + '1', ]
         self._lazy_load_api = url_pattern
         
     current_start = 1
@@ -16,9 +17,9 @@ class FkProductSpider(scrapy.Spider):
 
     def parse(self, response):
         '''
-            Starts here. Requires two urls from `constants.py`
-            1. `_start_urls`: starting urls list
-            2. `self._lazy_load_api`: Loading more products pattern
+        Starts here. Requires two urls from `constants.py`
+        1. `_start_urls`: starting urls list
+        2. `self._lazy_load_api`: Loading more products pattern
         '''
         items = response.xpath('//a[@data-tracking-id="prd_title"]') 
         
