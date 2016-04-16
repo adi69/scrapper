@@ -11,6 +11,7 @@ import scrapy
 class Product(scrapy.Item):
     
     name = scrapy.Field()
+    pid = scrapy.Field()
     link = scrapy.Field()
     rating = scrapy.Field()
     reviews_count = scrapy.Field()

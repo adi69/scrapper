@@ -1,7 +1,7 @@
 import scrapy
 import json
 from flipkart_mobiles.items import Product
-
+import urlparse #to extract PID from fk_url
 
 class FkProductSpider(scrapy.Spider):
     
@@ -61,6 +61,13 @@ class FkProductSpider(scrapy.Spider):
         item['name'] = product_basic + ' ' + variant
         item['link'] = response.url
         
+        #Try get pid
+        try:
+            item['pid'] = urlparse.parse_qs(urlparse.urlparse(
+                response.url).query)['pid'][0]
+        except:
+            item['pid'] = ''
+            
         #Try get rating of the Product
         try:
             item['rating'] = response.xpath(
