@@ -1,0 +1,3 @@
+name=response.xpath('//*[@class="uiv2-title-tool-tip"]/a/text()').extract()
+brand=response.xpath('//*[@class="uiv2-title-tool-tip"]/a/span/text()').extract()
+
