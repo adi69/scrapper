@@ -10,6 +10,6 @@ import scrapy
 
 class Product(scrapy.Item):
     name = scrapy.Field()
-    variant = scrapy.Field()
+    #unit = scrapy.Field()
     link = scrapy.Field()
     price = scrapy.Field()

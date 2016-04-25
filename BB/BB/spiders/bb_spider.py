@@ -1,7 +1,7 @@
 import scrapy
 import json
 from BB.items import Product
-from cookies import cookies
+from cookies import cookie
 from scrapy.shell import inspect_response #inspect_response(response, self)
 
 
@@ -12,11 +12,14 @@ class BBSpider(scrapy.Spider):
     start_urls = ['http://www.bigbasket.com']
     i = 1
 
+    def __init__(self, city):
+        self.biscuit = cookie[city]
+    
     def parse(self, response):
         print '-------------------- i = ', self.i
         yield scrapy.Request(
             url="http://www.bigbasket.com/product/page/%s/?sid=HbqW8YeibWQDoWMSomNjozQ4OaJhb8KibHTNAdaibmbDomRzojE3"%self.i,
-            cookies=cookies, callback=self.product_pagex)
+            cookies=self.biscuit, callback=self.product_page)
         self.i += 1
     
     def product_pagex(self, response):
@@ -24,6 +27,10 @@ class BBSpider(scrapy.Spider):
         products = response.xpath('//*[contains(@id, "product")]')
         d_ = {}
         
+        if not products: 
+            print "---- THAT'S ALL FOLKS ---- ", response.url 
+            return
+
         for product in products:
             
             try:
@@ -50,20 +57,24 @@ class BBSpider(scrapy.Spider):
                 'descendant::*[@class="uiv2-field-wrap mt10"]/select/option[@selected and not(@disabled)]/text()').extract()
             
             try:
-                price = p_v_tag[1]
+                price = p_v_tag[1].strip()
             except:
                 price = ''
             
             try:
-                variant = p_v_tag[0]
+                variant = p_v_tag[0].strip()
             except:
                 variant = ''
             
-            item['link'] = link
+            item['link'] = response.urljoin(link)
             item['price'] = price
-            item['name'] = name
-            item['variant'] = variant
+            item['name'] = name + ', ' + variant 
             yield item
+        
+        yield scrapy.Request(
+            url="http://www.bigbasket.com/product/page/%s/?sid=HbqW8YeibWQDoWMSomNjozQ4OaJhb8KibHTNAdaibmbDomRzojE3"%self.i,
+            cookies=self.biscuit, callback=self.product_page)
+        self.i += 1
 
     def product_page(self, response):
         urls = response.xpath('//*[@class="uiv2-title-tool-tip"]/a/@href').extract()
@@ -72,11 +83,11 @@ class BBSpider(scrapy.Spider):
         
         for item in urls:
             yield scrapy.Request(url=response.urljoin(item),
-                    cookies=cookies, callback=self.product)
+                    cookies=self.biscuit, callback=self.product)
         
         yield scrapy.Request(
             url="http://www.bigbasket.com/product/page/%s/?sid=HbqW8YeibWQDoWMSomNjozQ4OaJhb8KibHTNAdaibmbDomRzojE3"%self.i,
-            cookies=cookies, callback=self.product_page)
+            cookies=self.biscuit, callback=self.product_page)
         self.i += 1
 
     def product(self, response):
@@ -109,9 +120,8 @@ class BBSpider(scrapy.Spider):
                             'descendant::*[@class="uiv2-price"]/text()').extract()[0]
                     break
 
-        item['name'] = name
-        item['price'] = price
+        item['name'] = name.strip()
+        item['price'] = price.strip()
         item['link'] = response.url
 
-        print item
         yield item
