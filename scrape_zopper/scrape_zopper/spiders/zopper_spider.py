@@ -6,7 +6,7 @@ class ZopperSpider(scrapy.Spider):
     '''
         get zopper merchants list
     '''
-    name = "zopper"
+    name = "merchant"
     allowed_domains = ["zopper.com"]
     start_urls = [ "http://stores.zopper.com/city/Gurgaon" ]
 
